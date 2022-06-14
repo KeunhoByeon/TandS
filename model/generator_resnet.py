@@ -96,6 +96,9 @@ class ResnetDecoder(nn.Module):
             model_decoder += [nn.Tanh()]
         elif activation == 'sigmoid':
             model_decoder += [nn.Sigmoid()]
+        elif activation == 'softmax':
+            model_decoder += [nn.Softmax()]
+
         self.model_res = nn.Sequential(*model_res)
         self.model_decoder = nn.Sequential(*model_decoder)
 

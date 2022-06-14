@@ -21,30 +21,30 @@ class LossFunction(_WeightedLoss):
     def _tuple_input_target_forward(self, input, target):
         d0, d1, d2, d3, d4, d5, d6 = input
         t0, t1, t2, t3, t4, t5, t6 = target
-        loss0 = self.loss_func(d0, t0) / (2 ** 1)
-        loss1 = self.loss_func(d1, t1) / (2 ** 2)
-        loss2 = self.loss_func(d2, t2) / (2 ** 3)
-        loss3 = self.loss_func(d3, t3) / (2 ** 4)
-        loss4 = self.loss_func(d4, t4) / (2 ** 5)
-        loss5 = self.loss_func(d5, t5) / (2 ** 6)
-        loss6 = self.loss_func(d6, t6) / (2 ** 7)
+        loss0 = self.loss_func(d0, t0)  # / (2 ** 1)
+        loss1 = self.loss_func(d1, t1)  # / (2 ** 2)
+        loss2 = self.loss_func(d2, t2)  # / (2 ** 3)
+        loss3 = self.loss_func(d3, t3)  # / (2 ** 4)
+        loss4 = self.loss_func(d4, t4)  # / (2 ** 5)
+        loss5 = self.loss_func(d5, t5)  # / (2 ** 6)
+        loss6 = self.loss_func(d6, t6)  # / (2 ** 7)
         loss = loss0 + loss1 + loss2 + loss3 + loss4 + loss5 + loss6
-        return loss
+        return loss / 7.
 
     def _tuple_input_forward(self, input, target):
         if isinstance(target, tuple) or isinstance(target, list):
             return self._tuple_input_target_forward(input, target)
 
         d0, d1, d2, d3, d4, d5, d6 = input
-        loss0 = self.loss_func(d0, target) / (2 ** 1)
-        loss1 = self.loss_func(d1, target) / (2 ** 2)
-        loss2 = self.loss_func(d2, target) / (2 ** 3)
-        loss3 = self.loss_func(d3, target) / (2 ** 4)
-        loss4 = self.loss_func(d4, target) / (2 ** 5)
-        loss5 = self.loss_func(d5, target) / (2 ** 6)
-        loss6 = self.loss_func(d6, target) / (2 ** 7)
+        loss0 = self.loss_func(d0, target)  # / (2 ** 1)
+        loss1 = self.loss_func(d1, target)  # / (2 ** 2)
+        loss2 = self.loss_func(d2, target)  # / (2 ** 3)
+        loss3 = self.loss_func(d3, target)  # / (2 ** 4)
+        loss4 = self.loss_func(d4, target)  # / (2 ** 5)
+        loss5 = self.loss_func(d5, target)  # / (2 ** 6)
+        loss6 = self.loss_func(d6, target)  # / (2 ** 7)
         loss = loss0 + loss1 + loss2 + loss3 + loss4 + loss5 + loss6
-        return loss
+        return loss / 7.
 
     def forward(self, input, target):
         if isinstance(input, tuple) or isinstance(input, list):
@@ -72,11 +72,14 @@ class CycleSegGan:
         self.D_B = NLayerDiscriminator(input_nc=output_nc)
 
         # Segmentation model
-        self.Seg = SegmentStacked(num_classes=num_classes)
-        # self.Seg = ResnetDecoder(output_nc=num_classes)
-        self.seg_weights = torch.FloatTensor([1 / 64, 24 / 64, 96 / 64]).to(self.device)  # default
-        # self.seg_weights = torch.FloatTensor([1 / 64, 24 / 64, 128 / 64]).to(self.device)  # stronger
-        # self.seg_weights = torch.FloatTensor([1 / 32, 8 / 32, 32 / 32]).to(self.device)  # 20220607184317_bad_weights
+        if args.seg_model == 'stacked':
+            self.Seg = SegmentStacked(num_classes=num_classes)
+        elif args.seg_model == 'resnet':
+            self.Seg = ResnetDecoder(output_nc=num_classes, activation='softmax')
+        else:
+            raise AssertionError
+
+        self.seg_weights = torch.FloatTensor([args.weight0, args.weight1, args.weight2]).to(self.device)
 
         # Loss funcs
         self.loss_funcs = {
