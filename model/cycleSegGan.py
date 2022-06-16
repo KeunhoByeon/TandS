@@ -79,6 +79,8 @@ class CycleSegGan:
         else:
             raise AssertionError
 
+        self.do_seg = False
+
         self.seg_weights = torch.FloatTensor([args.weight0, args.weight1, args.weight2]).to(self.device)
 
         # Loss funcs
@@ -167,7 +169,7 @@ class CycleSegGan:
         self.A_short_rec_A = self.G_D_A(A_features_A)
         self.A_long_rec_A = self.G_D_A(A_features_rec)
 
-        if self.mask_A is not None:
+        if self.mask_A is not None and self.do_seg:
             self.A_seg_ori = self.Seg(A_features_A)
             # self.A_seg_idt = self.Seg(A_features_B)
             self.A_seg_rec = self.Seg(A_features_rec)
@@ -182,7 +184,7 @@ class CycleSegGan:
         self.B_short_rec_B = self.G_D_B(B_features_B)
         self.B_long_rec_B = self.G_D_B(B_features_rec)
 
-        if self.mask_B is not None:
+        if self.mask_B is not None and self.do_seg:
             self.B_seg_ori = self.Seg(B_features_B)
             # self.B_seg_idt = self.Seg(B_features_A)
             self.B_seg_rec = self.Seg(B_features_rec)
@@ -212,14 +214,14 @@ class CycleSegGan:
 
         # Seg Loss
         self.seg_loss = None
-        if self.mask_A is not None:
+        if self.mask_A is not None and self.do_seg:
             A_seg_ori_loss = self.loss_funcs['seg'](self.A_seg_ori, self.mask_A)
             # A_seg_idt_loss = self.loss_funcs['seg'](self.A_seg_idt, self.mask_A)
             A_seg_rec_loss = self.loss_funcs['seg'](self.A_seg_rec, self.mask_A)
             A_seg_scp_loss = self.loss_funcs['scp'](self.A_seg_ori, self.A_seg_rec)
             A_seg_loss = (A_seg_ori_loss + A_seg_rec_loss + A_seg_scp_loss) * self.loss_rate['A'] * self.loss_rate['seg']
             self.seg_loss = A_seg_loss
-        if self.mask_B is not None:
+        if self.mask_B is not None and self.do_seg:
             B_seg_ori_loss = self.loss_funcs['seg'](self.B_seg_ori, self.mask_B)
             # B_seg_idt_loss = self.loss_funcs['seg'](self.B_seg_idt, self.mask_B)
             B_seg_rec_loss = self.loss_funcs['seg'](self.B_seg_rec, self.mask_B)

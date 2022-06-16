@@ -35,7 +35,7 @@ def val(args, epoch, model, val_loader, logger=None):
             loss_list = model.get_current_loss()
 
             for loss_name, temp_l in zip(loss_names, loss_list):
-                total_losses[loss_name][0] += temp_l.data.item()
+                total_losses[loss_name][0] += temp_l.data.item() if temp_l is not None else 0
                 total_losses[loss_name][1] += 1
 
             if args.debug:
@@ -69,10 +69,10 @@ def train(args, epoch, model, train_loader, logger=None):
         loss_list = model.get_current_loss()
 
         for loss_name, temp_l in zip(loss_names, loss_list):
-            total_losses[loss_name][0] += temp_l.data.item()
+            total_losses[loss_name][0] += temp_l.data.item() if temp_l is not None else 0
             total_losses[loss_name][1] += 1
             if logger is not None:
-                temp_losses[loss_name][0] += temp_l.data.item()
+                temp_losses[loss_name][0] += temp_l.data.item() if temp_l is not None else 0
                 temp_losses[loss_name][1] += 1
 
         num_progress += len(cet1s)
@@ -125,6 +125,9 @@ def run(args):
 
     print('Training...')
     for epoch in range(args.start_epoch, args.epochs):
+        if epoch >= args.seg_after:
+            model.do_seg = True
+
         train_total_loss = train(args, epoch, model, train_loader, logger=logger)
         if epoch % args.val_freq == 0:
             val_total_loss = val(args, epoch, model, val_loader, logger=logger)
@@ -141,9 +144,10 @@ if __name__ == '__main__':
     parser.add_argument('--start_epoch', default=0, type=int, help='manual epoch number')
     parser.add_argument('--batch_size', default=6, type=int, help='mini-batch size')
     parser.add_argument('--seg_model', default='stacked')
-    parser.add_argument('--weight0', default=1 / 64, type=float)
-    parser.add_argument('--weight1', default=24 / 64, type=float)
-    parser.add_argument('--weight2', default=92 / 64, type=float)
+    parser.add_argument('--seg_after', default=0, type=int)
+    parser.add_argument('--weight0', default=1 / 100, type=float)
+    parser.add_argument('--weight1', default=12 / 20, type=float)
+    parser.add_argument('--weight2', default=24 / 20, type=float)
     parser.add_argument('--lr_D', default=0.0001, type=float, help='initial learning rate of D')
     parser.add_argument('--lr_G', default=0.0001, type=float, help='initial learning rate of G')
     parser.add_argument('--loss_rate_A', default=1.0, type=float)
