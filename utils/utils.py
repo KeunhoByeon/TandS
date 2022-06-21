@@ -75,13 +75,22 @@ def debug_result(save_dir, cet1s, hrt2s, masks, fakes_1, fakes_2, seg_preds, seg
     fakes_2 = ((torch.squeeze(fakes_2.cpu().detach(), 1).numpy() + 1.) / 2 * 255.).astype(np.uint8)
 
     masks = (torch.squeeze(masks.cpu().detach(), 1).numpy() * 127.).astype(np.uint8)
-    seg_preds = (torch.squeeze(seg_preds.cpu().detach(), 1).numpy().argmax(axis=1) * 127.).astype(np.uint8)
-    seg_idt_preds = (torch.squeeze(seg_idt_preds.cpu().detach(), 1).numpy().argmax(axis=1) * 127.).astype(np.uint8)
 
-    for i, (cet1, hrt2, mask, fake_1, fake_2, seg_pred, seg_idt_pred) in enumerate(zip(cet1s, hrt2s, masks, fakes_1, fakes_2, seg_preds, seg_idt_preds)):
-        debug_image = np.hstack((cet1, hrt2, mask, fake_1, fake_2, seg_pred, seg_idt_pred))
-        save_filename = '' if tag is None else '{}_'.format(tag) + '{}.png'.format(i)
-        cv2.imwrite(os.path.join(save_dir, save_filename), debug_image)
+    if seg_preds is not None and seg_idt_preds is not None:
+        seg_preds = (torch.squeeze(seg_preds.cpu().detach(), 1).numpy().argmax(axis=1) * 127.).astype(np.uint8)
+        seg_idt_preds = (torch.squeeze(seg_idt_preds.cpu().detach(), 1).numpy().argmax(axis=1) * 127.).astype(np.uint8)
+
+        for i, (cet1, hrt2, mask, fake_1, fake_2, seg_pred, seg_idt_pred) in enumerate(zip(cet1s, hrt2s, masks, fakes_1, fakes_2, seg_preds, seg_idt_preds)):
+            debug_image = np.hstack((cet1, hrt2, mask, fake_1, fake_2, seg_pred, seg_idt_pred))
+            save_filename = '' if tag is None else '{}_'.format(tag) + '{}.png'.format(i)
+            cv2.imwrite(os.path.join(save_dir, save_filename), debug_image)
+    else:
+        for i, (cet1, hrt2, mask, fake_1, fake_2) in enumerate(zip(cet1s, hrt2s, masks, fakes_1, fakes_2)):
+            seg_pred = np.zeros(mask.shape)
+            seg_idt_preds = np.zeros(mask.shape)
+            debug_image = np.hstack((cet1, hrt2, mask, fake_1, fake_2, seg_pred, seg_idt_preds))
+            save_filename = '' if tag is None else '{}_'.format(tag) + '{}.png'.format(i)
+            cv2.imwrite(os.path.join(save_dir, save_filename), debug_image)
 
 
 # Image Utils-------------------------------------------------------------------------------------------------------------------------------------------------------

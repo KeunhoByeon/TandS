@@ -236,14 +236,14 @@ class CycleSegGan:
 
     def get_loss_D_A(self):
         true_A_pred = self.D_A(self.A)
-        fake_A_pred = self.D_A(self.fake_A_pool.query(self.B_fake_A))
+        fake_A_pred = self.D_A(self.fake_A_pool.query(self.B_fake_A.detach()))
         D_A_true_loss = self.loss_funcs['gan'](true_A_pred, torch.tensor(1.0, device=true_A_pred.device).expand_as(true_A_pred))
         D_A_false_loss = self.loss_funcs['gan'](fake_A_pred, torch.tensor(0.0, device=fake_A_pred.device).expand_as(fake_A_pred))
         self.D_A_loss = (D_A_true_loss + D_A_false_loss) * self.loss_rate['A']
 
     def get_loss_D_B(self):
         true_B_pred = self.D_B(self.B)
-        fake_B_pred = self.D_B(self.fake_B_pool.query(self.A_fake_B))
+        fake_B_pred = self.D_B(self.fake_B_pool.query(self.A_fake_B.detach()))
         D_B_true_loss = self.loss_funcs['gan'](true_B_pred, torch.tensor(1.0, device=true_B_pred.device).expand_as(true_B_pred))
         D_B_false_loss = self.loss_funcs['gan'](fake_B_pred, torch.tensor(0.0, device=fake_B_pred.device).expand_as(fake_B_pred))
         self.D_B_loss = (D_B_true_loss + D_B_false_loss) * self.loss_rate['B']
