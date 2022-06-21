@@ -8,9 +8,8 @@ import torch
 from tqdm import tqdm
 
 from dataloader import MRIDataset
-from logger import Logger
 from model import CycleSegGan
-from utils import debug_result
+from utils import Logger, debug_result
 
 warnings.filterwarnings(action='ignore')
 

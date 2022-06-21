@@ -1,4 +1,4 @@
-class Logger():
+class Logger:
     def __init__(self, log_path: str = 'log.txt', epochs: int = 0, dataset_size: int = 0, components: list = [], float_round: int = -1):
         self.log_path = log_path
         self.epochs = epochs
