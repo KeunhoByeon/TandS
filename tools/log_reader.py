@@ -3,6 +3,7 @@ from matplotlib import pyplot as plt
 
 # loss_names = ["G", "G_A", "G_B", "seg", "D_A", "D_B", "G_A_idt", "G_A_rec", "G_A_gan", "G_B_idt", "G_B_rec", "G_B_gan"]
 loss_names = ["G_A", "G_B", "seg", "D_A", "D_B"]
+seg_after = 10
 
 
 def preprocess(data):
@@ -11,6 +12,9 @@ def preprocess(data):
             continue
 
         arr = np.array(data[loss_name])
+        if loss_name == 'seg':
+            arr[:seg_after] = arr[seg_after]
+
         arr = (arr - min(arr)) / (max(arr) - min(arr))
         data[loss_name] = arr
 
@@ -63,7 +67,7 @@ def read_log(log_path):
 
 
 if __name__ == '__main__':
-    log_path = '../results/20220609170613_stackedSeg_default_weight/log.txt'
+    log_path = '../results/20220617031332/log.txt'
 
     train_loss, val_loss = read_log(log_path)
 

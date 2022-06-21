@@ -39,8 +39,11 @@ def val(args, epoch, model, val_loader, logger=None):
                 total_losses[loss_name][1] += 1
 
             if args.debug:
-                debug_result(os.path.join(args.result, 'debug', str(epoch)), cet1s, hrt2s, masks, model.B_fake_A, model.A_fake_B,
-                             model.A_seg_ori[0] if isinstance(model.A_seg_ori, tuple) else model.A_seg_ori, model.A_seg_rec[0] if isinstance(model.A_seg_rec, tuple) else model.A_seg_rec, tag=str(i))
+                if model.do_seg:
+                    debug_result(os.path.join(args.result, 'debug', str(epoch)), cet1s, hrt2s, masks, model.B_fake_A, model.A_fake_B,
+                                 model.A_seg_ori[0] if isinstance(model.A_seg_ori, tuple) else model.A_seg_ori, model.A_seg_rec[0] if isinstance(model.A_seg_rec, tuple) else model.A_seg_rec, tag=str(i))
+                else:
+                    debug_result(os.path.join(args.result, 'debug', str(epoch)), cet1s, hrt2s, masks, model.B_fake_A, model.A_fake_B, None, None, tag=str(i))
 
     if logger is not None:
         logger('*Validation', components_data=total_losses, time=time.time() - start_time)
