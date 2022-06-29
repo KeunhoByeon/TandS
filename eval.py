@@ -67,8 +67,8 @@ def eval(args):
             mask = output[0].detach().numpy().argmax(axis=1)[0]
             if np.max(mask) == 0:
                 continue
-            # cv2.imwrite(os.path.join(args.save_dir, os.path.basename(file_path)), blending(input_np, mask))
-            cv2.imwrite(os.path.join(args.save_dir, os.path.basename(file_path)), mask)
+            cv2.imwrite(os.path.join(args.save_dir, os.path.basename(file_path)), blending(input_np, mask))
+            # cv2.imwrite(os.path.join(args.save_dir, os.path.basename(file_path)), mask)
 
 
 if __name__ == '__main__':
